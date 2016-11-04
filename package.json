@@ -1,0 +1,30 @@
+{
+  "name": "pus",
+  "version": "1.0.0",
+  "description": "[pʌʃ] is a rapid personnal logging system.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "commander": "^2.9.0",
+    "mkdirp": "^0.5.1",
+    "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "timekeeper": "^1.0.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "bin": {
+    "pus": "./bin/pus"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:samjoch/pus.git"
+  },
+  "author": "Sam Joch",
+  "license": "ISC"
+}
