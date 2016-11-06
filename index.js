@@ -29,20 +29,31 @@ let _ = {
     process.stdout.write(out);
   },
   err (msg) {
+    if (process.env.NODE_ENV === 'test') {
+      debug('[err throw]', msg);
+      return;
+    }
     throw new Error(msg);
   }
 };
 
 class LocalStorage {
   constructor (opts) {
+    opts = opts || {};
+    this.isReady = opts.isReady || () => {}
     debug('LocalStorage#constructor');
     this.dotpath = path.join(process.env.HOME, '.pus');
     this.mkdir();
+
+    let suf = opts.env === 'test' ? '-test' : '';
+    this.path = path.join(this.dotpath, `commits${suf}.db`);
+  }
+
+  connect() {
     this.docs = new Document({
-      filename: path.join(this.dotpath, 'commits.db'),
-      autoload: true
+      filename: this.path
     });
-    opts.isReady();
+    this.docs.loadDatabase(this.isReady.bind(this));
   }
 
   mkdir () {
@@ -113,6 +124,7 @@ class Validation {
     this.cantdoc = `Can't execute '${this.cmd}' command.`;
     this.seedoc = `see doc by taping 'pus ${this.cmd} --help'`;
     this.options = options;
+
     this.fields = options.options.map((opt) => opt.long.slice(2));
 
     if (typeof this.options !== 'object') {
@@ -135,6 +147,7 @@ class Validation {
   event () { return true; }
   note () { return true; }
   done () { return true; }
+  collection () { return true; }
 
   limit (val) {
     debug('Validation#limit', val);
@@ -257,8 +270,9 @@ class Commit extends Command {
     }
   }
 
-  run (parent) {
+  run (parent, cb) {
     let flag = this.flag || (this.task ? '.' : (this.event ? 'o' : '-'));
+
     let doc = {
       date: this.date,
       text: [flag, this.text].join(' '),
@@ -267,10 +281,17 @@ class Commit extends Command {
     if (parent) {
       doc.parent = parent;
     }
+    if (this.collection) {
+      doc.collection = this.collection;
+    }
+
     this.storage.count((count) => {
       doc.sha1 = _.sha1(`${count}|${doc.date}|${doc.text}`);
       this.storage.insert(doc, () => {
         debug('Pus#commit', 'ok');
+        if (cb) {
+          cb(doc.sha1.slice(0, 7));
+        }
       });
     });
   }
@@ -324,12 +345,18 @@ class Pus {
   constructor (opts) {
     this.StorageKlass = LocalStorage;
     this.storage = new this.StorageKlass({
+      env: opts.env || '',
       isReady: this.isReady.bind(this)
     });
   }
 
+  run() {
+    this.storage.connect();
+  }
+
   isReady () {
     debug(`${name} is ready`);
+    program.parse(process.argv);
   }
 
   exec (name, ...args) {
@@ -371,7 +398,7 @@ class Pus {
   }
 }
 
-let pus = new Pus();
+let pus = new Pus({ env: process.env.NODE_ENV });
 
 program
   .description(`${name} is a rapid personnal logging system.`)
@@ -384,6 +411,7 @@ program
   .option('-t, --task', 'commit as a task')
   .option('-o, --event', 'commit as an event')
   .option('-n, --note', 'commit as a note')
+  .option('-c, --collection <name>', 'commit as a collection or link to it')
   .option('-d, --date <date>', 'force date, format YYYY-MM-DD, default today')
   .option('-l, --limit <number>', 'extend characters limitation, default 59')
   .action(pus.exec.bind(pus, 'commit'));
@@ -397,6 +425,7 @@ program
   .option('-o, --event', 'show only events')
   .option('-n, --note', 'show only notes')
   .option('-x, --done', 'show only done tasks')
+  .option('-c, --collection', 'show only collections')
   .action(pus.exec.bind(pus, 'log'));
 
 program
@@ -408,6 +437,7 @@ program
   .option('-o, --event', 'show only events')
   .option('-n, --note', 'show only notes')
   .option('-x, --done', 'show only done tasks')
+  .option('-c, --collection', 'show only collections')
   .action(pus.exec.bind(pus, 'grep'));
 
 program
@@ -434,4 +464,6 @@ program
     console.log('unknow command "%s"', cmd);
   });
 
-program.parse(process.argv);
+pus.run();
+
+module.exports = {_, program, LocalStorage, Commit};

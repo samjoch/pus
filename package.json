@@ -11,13 +11,14 @@
     "commander": "^2.9.0",
     "debug": "^2.2.0",
     "mkdirp": "^0.5.1",
+    "mocha": "^3.1.2",
     "nedb": "^1.8.0"
   },
   "devDependencies": {
     "timekeeper": "^1.0.0"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "NODE_ENV=test mocha --harmony"
   },
   "bin": {
     "pus": "./bin/pus"
