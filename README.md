@@ -1,4 +1,4 @@
-# Pus [pʌʃ]
+# Pus [pʌʃ] ![Build status](https://travis-ci.org/samjoch/pus.svg?branch=master)
 
 [pʌʃ] is a rapid personnal logging system.
 
