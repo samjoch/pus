@@ -411,7 +411,7 @@ program
   .option('-t, --task', 'commit as a task')
   .option('-o, --event', 'commit as an event')
   .option('-n, --note', 'commit as a note')
-  .option('-c, --collection <name>', 'commit as a collection or link to it')
+  .option('-c, --collection <sha1>', 'commit as a collection or link to it')
   .option('-d, --date <date>', 'force date, format YYYY-MM-DD, default today')
   .option('-l, --limit <number>', 'extend characters limitation, default 59')
   .action(pus.exec.bind(pus, 'commit'));
@@ -455,7 +455,7 @@ program
 
 program
   .command('show <sha1>')
-  .description('show a task using its sha1')
+  .description('show a task using its sha1 or a collection')
   .action(pus.exec.bind(pus, 'show'));
 
 program

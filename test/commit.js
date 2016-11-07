@@ -104,26 +104,10 @@ describe('Commit', () => {
       });
     });
   });
-  it.skip('should insert a collection', (done) => {
-    let options = [{ long: '--collection' }];
-    let commit = new Commit(storage, {
-      collection: true,
-      options,
-      text: 'Hello World'
-    });
-    commit.run(null, (sha1) => {
-      storage.findOne({ sha1: new RegExp(`^${sha1}`) }, (doc) => {
-        assert.equal(doc.text, 'c Hello World');
-        assert.equal(doc.flag, 'c');
-        assert.ok(!doc.collection);
-        done();
-      });
-    });
-  });
   it('should insert a note in a collection', (done) => {
     let options = [{ long: '--note' }, { long: '--collection' }];
     let commit = new Commit(storage, {
-      collection: 'collection name',
+      collection: 'col-sha1',
       note: true,
       options,
       text: 'Hello World'
@@ -132,11 +116,9 @@ describe('Commit', () => {
       storage.findOne({ sha1: new RegExp(`^${sha1}`) }, (doc) => {
         assert.equal(doc.text, '- Hello World');
         assert.equal(doc.flag, '-');
-        assert.ok(doc.collection, 'sha1');
+        assert.equal(doc.collection, 'col-sha1');
         done();
       });
     });
   });
-  it('should insert a task in a collection');
-  it('should insert an event in a collection');
 });
