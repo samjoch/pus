@@ -434,6 +434,7 @@ program
 
 program
   .command('collection <text>')
+  .alias('c')
   .description('manage collections')
   .option('-d, --date <date>', 'force date, format YYYY-MM-DD, default today')
   .option('-l, --limit <number>', 'extend characters limitation, default 59')
