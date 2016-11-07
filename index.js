@@ -41,6 +41,7 @@ class LocalStorage {
   constructor (opts) {
     opts = opts || {};
     this.isReady = opts.isReady || () => {}
+    this.inMemory = opts.inMemory || false;
     debug('LocalStorage#constructor');
     this.dotpath = path.join(process.env.HOME, '.pus');
     this.mkdir();
@@ -51,7 +52,8 @@ class LocalStorage {
 
   connect() {
     this.docs = new Document({
-      filename: this.path
+      filename: this.path,
+      inMemoryOnly: this.inMemory
     });
     this.docs.loadDatabase(this.isReady.bind(this));
   }

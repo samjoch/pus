@@ -15,12 +15,8 @@ let err = _.err;
 
 let hook = {
   beforeEach (done) {
-    let testFilename = path.join(HOME, '.pus', 'commits-test.db');
-    if (fs.existsSync(testFilename)) {
-      fs.unlinkSync(testFilename);
-    }
-
     storage = new LocalStorage({
+      inMemory: true,
       env: 'test',
       isReady: done
     });
