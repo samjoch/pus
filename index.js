@@ -297,9 +297,16 @@ class Commit extends Command {
   }
 }
 
+class Collection extends Commit {
+  run (cb) {
+    this.flag = 'c';
+    super.run(null, cb);
+  }
+}
+
 class Log extends Command {
   query () {
-    let query = { flag: /[\.\-ox]/ };
+    let query = { flag: /[\.\-oxc]/ };
     if (this.task) {
       query.flag = /\./;
     } else if (this.event) {
@@ -369,6 +376,12 @@ class Pus {
     cmd.run();
   }
 
+  collection (text, options) {
+    options.text = text;
+    let cmd = new Collection(this.storage, options);
+    cmd.run();
+  }
+
   log (options) {
     let cmd = new Log(this.storage, options);
     cmd.run();
@@ -415,6 +428,13 @@ program
   .option('-d, --date <date>', 'force date, format YYYY-MM-DD, default today')
   .option('-l, --limit <number>', 'extend characters limitation, default 59')
   .action(pus.exec.bind(pus, 'commit'));
+
+program
+  .command('collection <text>')
+  .description('manage collections')
+  .option('-d, --date <date>', 'force date, format YYYY-MM-DD, default today')
+  .option('-l, --limit <number>', 'extend characters limitation, default 59')
+  .action(pus.exec.bind(pus, 'collection'));
 
 program
   .command('log')
@@ -466,4 +486,4 @@ program
 
 pus.run();
 
-module.exports = {_, program, LocalStorage, Commit};
+module.exports = {_, program, LocalStorage, Commit, Collection};

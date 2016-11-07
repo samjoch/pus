@@ -5,6 +5,7 @@ const path = require('path');
 const assert = require('assert');
 const _ = require('../')._;
 const Commit = require('../').Commit;
+const Collection = require('../').Collection;
 const LocalStorage = require('../').LocalStorage;
 
 const HOME = process.env.HOME;
@@ -12,8 +13,8 @@ const HOME = process.env.HOME;
 let storage;
 let err = _.err;
 
-describe('Commit', () => {
-  beforeEach((done) => {
+let hook = {
+  beforeEach (done) {
     let testFilename = path.join(HOME, '.pus', 'commits-test.db');
     if (fs.existsSync(testFilename)) {
       fs.unlinkSync(testFilename);
@@ -24,12 +25,16 @@ describe('Commit', () => {
       isReady: done
     });
     storage.connect();
-  });
-
-  after(() => {
+  },
+  after () {
     _.err = err;
-  });
-  
+  }
+};
+
+describe('Commit', () => {
+  beforeEach(hook.beforeEach);
+  after(hook.after);
+
   it('should assign options and have a storage', () => {
     let commit = new Commit(storage, { foo: 'bar', options: [], text: '' });
     assert.equal(commit.foo, 'bar');
@@ -117,6 +122,27 @@ describe('Commit', () => {
         assert.equal(doc.text, '- Hello World');
         assert.equal(doc.flag, '-');
         assert.equal(doc.collection, 'col-sha1');
+        done();
+      });
+    });
+  });
+});
+
+describe('Collection', () => {
+  beforeEach(hook.beforeEach);
+  after(hook.after);
+
+  it('should insert a new collection', (done) => {
+    let options = [];
+    let collection = new Collection(storage, {
+      options,
+      text: 'New collection'
+    });
+    collection.run((sha1) => {
+      storage.findOne({ sha1: new RegExp(`^${sha1}`) }, (doc) => {
+        assert.equal(doc.text, 'c New collection');
+        assert.equal(doc.flag, 'c');
+        assert.ok(!doc.collection);
         done();
       });
     });
