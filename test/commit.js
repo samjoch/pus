@@ -12,6 +12,7 @@ const HOME = process.env.HOME;
 
 let storage;
 let err = _.err;
+let stdout = _.stdout;
 
 let hook = {
   beforeEach (done) {
@@ -24,6 +25,7 @@ let hook = {
   },
   after () {
     _.err = err;
+    _.stdout = stdout;
   }
 };
 
@@ -51,12 +53,17 @@ describe('Commit', () => {
     assert.ok(noErr);
   });
   it('should insert a note', (done) => {
+    let shouldStdout = false;
+    _.stdout = () => {
+      shouldStdout = true;
+    };
     let commit = new Commit(storage, { options: [], text: 'Hello World' });
     commit.run(null, (sha1) => {
       storage.findOne({ sha1: new RegExp(`^${sha1}`) }, (doc) => {
         assert.equal(doc.text, '- Hello World');
         assert.equal(doc.flag, '-');
         assert.ok(!doc.collection);
+        assert.ok(shouldStdout);
         done();
       });
     });

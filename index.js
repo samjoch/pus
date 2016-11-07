@@ -291,6 +291,7 @@ class Commit extends Command {
       doc.sha1 = _.sha1(`${count}|${doc.date}|${doc.text}`);
       this.storage.insert(doc, () => {
         debug('Pus#commit', 'ok');
+        _.stdout([doc]);
         if (cb) {
           cb(doc.sha1.slice(0, 7));
         }
