@@ -318,6 +318,8 @@ class Log extends Command {
       query.flag = /-/;
     } else if (this.done) {
       query.flag = /x/;
+    } else if (this.collection) {
+      query.flag = /c/;
     }
 
     if (this.date) {
