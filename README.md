@@ -24,6 +24,11 @@ $ pus commit -o 'my wife birthday' -d 2016-12-24
 $ pus commit 'a note'
 $ pus commit -n 'a note' -d 2016-01-01
 
+# Create a collection
+$ pus collection 'Future log'
+# Add a task in a collection
+$ pus ci -c 340d48e 'a new task in Future log'
+
 # List all notes, events, tasks
 $ pus log
 $ pus log -t # only tasks
