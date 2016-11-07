@@ -43,7 +43,7 @@ describe('LocalStorage', () => {
     storage.connect();
   });
   it('should insert a doc', (done) => {
-    let line = new RegExp("{\"foo\":\"bar\",\"at\":\".*\",\"_id\":\".*\"}");
+    let line = new RegExp("{\"foo\":\"bar\",\"_id\":\".*\"}");
     let storage = new LocalStorage({ env: 'test', isReady: () => {
       storage.insert({ foo: 'bar' }, () => {
         let db = fs.readFileSync(storage.path).toString();
@@ -54,7 +54,7 @@ describe('LocalStorage', () => {
     storage.connect();
   });
   it('should insert a new doc', (done) => {
-    let line = new RegExp("{\"foo2\":\"bar2\",\"at\":\".*\",\"_id\":\".*\"}");
+    let line = new RegExp("{\"foo2\":\"bar2\",\"_id\":\".*\"}");
     let storage = new LocalStorage({ env: 'test', isReady: () => {
       storage.insert({ foo2: 'bar2' }, () => {
         let db = fs.readFileSync(storage.path).toString().split('\n')[1];

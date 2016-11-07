@@ -129,6 +129,20 @@ describe('Commit', () => {
       });
     });
   });
+  it('should associate a sha1', (done) => {
+    let options = [];
+    let commit = new Commit(storage, {
+      options,
+      text: 'Hello World'
+    });
+    commit.run(null, (sha1) => {
+      storage.findOne({ sha1: new RegExp(`^${sha1}`) }, (doc) => {
+        let gsha1 = _.sha1(`${doc.at}|${doc.date}|${doc.text.slice(2)}`);
+        assert.equal(doc.sha1, gsha1);
+        done();
+      });
+    });
+  });
 });
 
 describe('Collection', () => {

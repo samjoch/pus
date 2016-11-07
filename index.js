@@ -65,7 +65,6 @@ class LocalStorage {
 
   insert (doc, cb) {
     debug('Storage#insert');
-    doc.at = new Date().toJSON();
     this.docs.insert(doc, (err) => {
       if (err) {
         _.err(`Error while trying to insert. ${err.message}`);
@@ -288,7 +287,8 @@ class Commit extends Command {
     }
 
     this.storage.count((count) => {
-      doc.sha1 = _.sha1(`${doc.at}|${doc.date}|${doc.text}`);
+      doc.at = new Date().toJSON();
+      doc.sha1 = _.sha1(`${doc.at}|${doc.date}|${this.text}`);
       this.storage.insert(doc, () => {
         debug('Pus#commit', 'ok');
         _.stdout([doc]);
